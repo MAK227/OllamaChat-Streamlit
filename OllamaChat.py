@@ -2,7 +2,12 @@ from langchain.chains import LLMChain
 from langchain.memory import ConversationBufferMemory
 from langchain_community.chat_models import ChatOllama
 from langchain.prompts.chat import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
+from langchain.prompts.chat import (
+    ChatPromptTemplate,
+    HumanMessagePromptTemplate,
+    MessagesPlaceholder,
+)
+from langchain_core.messages import SystemMessage
 import streamlit as st
 import time
 import subprocess
@@ -32,14 +37,22 @@ if "model" not in st.session_state and "selected_model" in st.session_state and 
 
     st.write("Chatting with 🤖", st.session_state.selected_model)
 
-    st.session_state.prompt_template =ChatPromptTemplate.from_template("You are a helpful and knowledgeable assistant. {text}")
+    template_messages = [
+    
+        SystemMessage(content="You are a helpful and knowledgeable assistant."),
+        
+        MessagesPlaceholder(variable_name="chat_history"),
+        
+        HumanMessagePromptTemplate.from_template("{text}"),
+    ]
 
-    st.session_state.model = ChatOllama(model=str(st.session_state.selected_model)
-                    )
+    st.session_state.prompt_template = ChatPromptTemplate.from_messages(template_messages)
+
+    st.session_state.model = ChatOllama(model=str(st.session_state.selected_model))
 
     st.session_state.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
-    st.session_state.chain = LLMChain(llm=st.session_state.model, prompt=st.session_state.prompt_template, memory=st.session_state.memory, output_parser=StrOutputParser(), name=st.session_state.selected_model)
+    st.session_state.chain = LLMChain(llm=st.session_state.model, prompt=st.session_state.prompt_template, memory=st.session_state.memory)
 
     print(st.session_state.chain)
 
@@ -79,7 +92,6 @@ if "selected_model" in st.session_state and "model" in st.session_state:
                 message_placeholder.markdown(full_response + "▌")
             message_placeholder.markdown(full_response)
             # st.write(full_response)
-
 
         # Add assistant response to chat history
         st.session_state.messages.append({"role": "assistant", "content": response})
