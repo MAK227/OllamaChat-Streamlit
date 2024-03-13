@@ -10,7 +10,7 @@ from langchain.prompts.chat import (
 from langchain_core.messages import SystemMessage
 import streamlit as st
 import time
-import subprocess
+import requests
 
 # Response generator function
 def response_generator():
@@ -98,14 +98,14 @@ if "selected_model" in st.session_state and "model" in st.session_state:
 
 else:
 
-    result = subprocess.run(['ollama', 'list'], stdout=subprocess.PIPE)
 
-    print(result.stdout.decode('utf-8'))
+    # Get all models
 
-    # Assuming result.stdout.decode('utf-8') gives the output you posted
-    output = result.stdout.decode('utf-8')
+    result = requests.get('http://localhost:11434/api/tags').json()['models']
 
-    st.session_state.names = tuple([line.split()[0] for line in output.strip().split('\n')[1:]])
+    # Put them in list and store in session state
+
+    st.session_state.names = tuple([f"{model['name']}" for model in result])
 
     print(st.session_state.names)
 
