@@ -4,10 +4,9 @@
 
 OllamaChat is a chatbot application built with Python, using the Ollama and LangChain libraries. It allows users to interact with different chatbot models, which can be selected from a dropdown menu.
 
-## Note
-
-These models tend to hallucinate :D
-Any improvements or fixes are welcome
+> [!NOTE]
+> These models tend to hallucinate :D
+> Any improvements or fixes are welcome
 
 ## Installation
 
